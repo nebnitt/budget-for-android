@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.android.budget.data.BudgetContract;
@@ -58,9 +59,10 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
         String dollarsWithDollarSign = "$"+String.valueOf(dollarsSpent);
         holder.dollarTextView.setText(dollarsWithDollarSign);
 
-
-//        holder.itemView.setTag(mLastAddedGuestId);
         holder.itemView.setTag(id);
+
+        ImageButton button = (ImageButton)holder.itemView.findViewById(R.id.create_edit_dialog_button);
+        button.setTag(id);
     }
 
 
@@ -70,7 +72,6 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
     }
 
     public void swapCursor(Cursor newCursor){//, long lastAddedGuestId){
-//        mLastAddedGuestId = lastAddedGuestId;
         if(mCursor != null)
             mCursor.close();
         mCursor = newCursor;

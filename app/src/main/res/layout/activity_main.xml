@@ -34,7 +34,7 @@
             android:id="@+id/dollars_spent_edit_text"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/dollars_spent_hint"
+            android:hint="@string/dollars_spent_hint"
             android:gravity="center"
             android:inputType="number"
             android:maxLength="3"

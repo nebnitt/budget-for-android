@@ -2,9 +2,10 @@
     <string name="app_name">Budget</string>
     <string name="name_hint">Name</string>
     <string name="spent_on_what_hint">Spent On?</string>
-    <string name="dollars_spent_hint">How Much?</string>
+    <string name="dollars_spent_hint">$</string>
     <string name="add_button_text">ADD</string>
     <string name="see_overview_text">Overview</string>
+    <string name="edit">Edit</string>
     <string name="default_name">[Name]</string>
     <string name="default_dollars">\?</string>
     <string name="default_spent_on">On What?</string>
