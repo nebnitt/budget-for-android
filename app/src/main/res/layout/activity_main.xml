@@ -19,7 +19,7 @@
 
             android:hint="@string/name_hint"
             android:inputType="textPersonName|textCapWords"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <EditText
             android:id="@+id/spent_money_where_edit_text"
@@ -28,7 +28,7 @@
             android:layout_weight="1"
             android:hint="@string/spent_on_what_hint"
             android:inputType="textPersonName|textCapWords"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <EditText
             android:id="@+id/dollars_spent_edit_text"
@@ -37,21 +37,9 @@
             android:contentDescription="@string/dollars_spent_hint"
             android:gravity="center"
             android:inputType="number"
-            android:maxLength="2"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+            android:maxLength="3"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
     </LinearLayout>
-
-
-    <Button
-        android:id="@+id/add_to_budget_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:background= "@color/colorPrimary"
-        android:onClick="addToBudgetList"
-        android:text="@string/add_button_text"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/all_budgets_list_view"

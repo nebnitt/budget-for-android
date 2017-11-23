@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/add_budget_entry"
+        android:title="@string/add_button_text"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/see_overview"
+        android:title="@string/see_overview_text"
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom"/>
+
+</menu>

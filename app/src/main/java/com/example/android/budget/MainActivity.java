@@ -1,17 +1,18 @@
 package com.example.android.budget;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
 import com.example.android.budget.data.BudgetContract;
-import com.example.android.budget.R;
 import com.example.android.budget.data.BudgetDbHelper;
 
 
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         // Link the adapter to the RecyclerView
         budgetRecyclerView.setAdapter(mAdapter);
 
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+/*        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
             @Override
@@ -79,19 +80,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir){
                 long guestId = (long)viewHolder.itemView.getTag();
-                removeGuest(guestId);
+                removeBudgetItem(guestId);
                 mAdapter.swapCursor(getAllBudgetEntries());
             }
-        }).attachToRecyclerView(budgetRecyclerView);
+        }).attachToRecyclerView(budgetRecyclerView);*/
 
     }
 
     /**
-     * This method is called when user clicks on the Add to waitlist button
-     *
-     * @param view The calling view (button)
+     * This method is called when user clicks on the Add to waitlist menu item
      */
-    public void addToBudgetList(View view) {
+    public void addToBudgetList() {
         if(mNewNameEditText.getText().length() == 0 || mNewSpentMoneyWhereEditText.getText().length() == 0
                 || mNewDollarsSpentEditText.getText().length() == 0){
             return;
@@ -101,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             int dollarsSpent = Integer.parseInt(mNewDollarsSpentEditText.getText().toString());
             String name = mNewNameEditText.getText().toString();
             String spentOn = mNewSpentMoneyWhereEditText.getText().toString();
-            addGuest(name, dollarsSpent, spentOn);
+            addBudgetItem(name, dollarsSpent, spentOn);
             mAdapter.swapCursor(getAllBudgetEntries());//, lastAddedGuestId);
         } catch (Exception e){
             e.printStackTrace();
@@ -135,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    private void addGuest(String name, int dollarsSpent, String spentOn){
+    private void addBudgetItem(String name, int dollarsSpent, String spentOn){
         String tableName = BudgetContract.BudgetEntry.TABLE_NAME;
         String nameCol = BudgetContract.BudgetEntry.COLUMN_NAME;
         String dollarsCol = BudgetContract.BudgetEntry.COLUMN_DOLLARS_SPENT;
@@ -155,10 +154,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void removeGuest(long idToRemove){
+    private void removeBudgetItem(long idToRemove){
         String id = String.valueOf(idToRemove);
         String sql = "DELETE FROM " + BudgetContract.BudgetEntry.TABLE_NAME + " WHERE _ID = " + id;
         mDb.execSQL(sql);
+    }
+
+    public void goToOverview(){
+        Intent intent = new Intent(this, OverviewActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem){
+        int item_id = menuItem.getItemId();
+        switch(item_id) {
+            case R.id.add_budget_entry:
+                addToBudgetList();
+                return true;
+            case R.id.see_overview:
+                goToOverview();
+                return true;
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 
 }
