@@ -16,27 +16,25 @@
         android:text="@string/default_name"/>
 
     <TextView
-        android:id="@+id/dollars_text_view"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_gravity="center"
-        android:background="@drawable/circle"
-        android:fontFamily="sans-serif"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:text="@string/default_dollars"/>
-
-    <TextView
         android:id="@+id/spent_on_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_weight="1"
         android:fontFamily="sans-serif"
-        android:textSize="16sp"
-        android:text="@string/default_spent_on"/>
+        android:text="@string/default_spent_on"
+        android:textSize="16sp" />
 
-
+    <TextView
+        android:id="@+id/dollars_text_view"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center"
+        android:background="@drawable/square"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="@string/default_dollars"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
 
 </LinearLayout>

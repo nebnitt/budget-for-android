@@ -50,12 +50,14 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
 
         long id = mCursor.getLong(mCursor.getColumnIndex(BudgetContract.BudgetEntry._ID));
 
-        // Display the guest name
+        // Display the name
         holder.nameTextView.setText(name);
-        // Display the party count
-        holder.dollarTextView.setText(String.valueOf(dollarsSpent));
         // Display spent on what
         holder.spentOnTextView.setText(spentOn);
+        // Display the dollars spent
+        String dollarsWithDollarSign = "$"+String.valueOf(dollarsSpent);
+        holder.dollarTextView.setText(dollarsWithDollarSign);
+
 
 //        holder.itemView.setTag(mLastAddedGuestId);
         holder.itemView.setTag(id);
