@@ -33,17 +33,12 @@ public class OverviewActivity extends AppCompatActivity {
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.overview_linear_layout);
         for (Map.Entry<String, Integer> entry : results.entrySet())
         {
-            TextView nameTextView = new TextView(this);
-            nameTextView.setText(entry.getKey());
-            nameTextView.setPadding(10, 10, 10, 10);
-            nameTextView.setTextSize(20);
-            linearLayout.addView(nameTextView);
-
-            TextView valueTextView = new TextView(this);
-            valueTextView.setText(entry.getValue().toString());
-            valueTextView.setPadding(10, 10, 10, 10);
-            valueTextView.setTextSize(20);
-            linearLayout.addView(valueTextView);
+            TextView overviewTextView = new TextView(this);
+            String overviewText = entry.getKey() + " has spent: $" + String.valueOf(entry.getValue());
+            overviewTextView.setText(overviewText);
+            overviewTextView.setPadding(10, 10, 10, 10);
+            overviewTextView.setTextSize(20);
+            linearLayout.addView(overviewTextView);
         }
     }
 
