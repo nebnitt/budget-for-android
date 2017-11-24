@@ -9,4 +9,11 @@
     <string name="default_name">[Name]</string>
     <string name="default_dollars">\?</string>
     <string name="default_spent_on">On What?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+
+    <string-array name="names_array">
+        <item>Dan</item>
+        <item>Erin</item>
+    </string-array>
 </resources>

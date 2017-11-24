@@ -11,15 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/person_name_edit_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-
-            android:hint="@string/name_hint"
-            android:inputType="textPersonName|textCapWords"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        <Spinner
+            android:id="@+id/person_name_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="8dp" />
 
         <EditText
             android:id="@+id/spent_money_where_edit_text"

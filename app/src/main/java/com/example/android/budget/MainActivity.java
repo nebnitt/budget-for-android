@@ -1,5 +1,6 @@
 package com.example.android.budget;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
@@ -10,22 +11,29 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+    implements OnItemSelectedListener {
 
     private BudgetAdapter mAdapter;
     private SqlUtils mSqlUtils;
 
-    private EditText mNewNameEditText;
     private EditText mNewDollarsSpentEditText;
     private EditText mNewSpentMoneyWhereEditText;
+
+    private Spinner mSelectNameSpinner;
 
     // d (1) Create local EditText members for mNewGuestNameEditText and mNewPartySizeEditText
 
@@ -37,12 +45,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final Activity mThis = this;
+
         RecyclerView budgetRecyclerView;
+
+        mSelectNameSpinner = (Spinner) findViewById(R.id.person_name_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.names_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSelectNameSpinner.setAdapter(adapter);
+        mSelectNameSpinner.setOnItemSelectedListener(this);
 
         // Set local attributes to corresponding views
         budgetRecyclerView = (RecyclerView) this.findViewById(R.id.all_budgets_list_view);
 
-        mNewNameEditText = (EditText) findViewById(R.id.person_name_edit_text);
         mNewDollarsSpentEditText = (EditText) findViewById(R.id.dollars_spent_edit_text);
         mNewSpentMoneyWhereEditText = (EditText) findViewById(R.id.spent_money_where_edit_text);
 
@@ -60,8 +76,9 @@ public class MainActivity extends AppCompatActivity {
         // Link the adapter to the RecyclerView
         budgetRecyclerView.setAdapter(mAdapter);
 
-/*        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+//            Activity activity = getCallingActivity();
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,RecyclerView.ViewHolder target) {
@@ -70,12 +87,39 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir){
-                long guestId = (long)viewHolder.itemView.getTag();
-                removeBudgetItem(guestId);
-                mAdapter.swapCursor(getAllBudgetEntries());
-            }
-        }).attachToRecyclerView(budgetRecyclerView);*/
+                final RecyclerView.ViewHolder fViewHolder = viewHolder;
 
+                AlertDialog.Builder builder = new AlertDialog.Builder(mThis);
+                // Add the buttons
+                builder.setMessage("Delete this budget item?");
+                builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        long guestId = (long)fViewHolder.itemView.getTag();
+                        mSqlUtils.removeBudgetItem(guestId);
+                        mAdapter.swapCursor(mSqlUtils.getAllBudgetEntries());
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                    }
+                });
+                // Create the AlertDialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        }).attachToRecyclerView(budgetRecyclerView);
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // fill in if we need action on selecting item from spinner
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // idk what this is for
     }
 
     public static class EditBudgetItemDialogFragment extends DialogFragment {
@@ -168,14 +212,14 @@ public class MainActivity extends AppCompatActivity {
      * This method is called when user clicks on the Add to waitlist menu item
      */
     public void addToBudgetList() {
-        if(mNewNameEditText.getText().length() == 0 || mNewSpentMoneyWhereEditText.getText().length() == 0
-                || mNewDollarsSpentEditText.getText().length() == 0){
+        if(mNewSpentMoneyWhereEditText.getText().length() == 0
+            || mNewDollarsSpentEditText.getText().length() == 0){
             return;
         }
 
         try {
             int dollarsSpent = Integer.parseInt(mNewDollarsSpentEditText.getText().toString());
-            String name = mNewNameEditText.getText().toString();
+            String name = mSelectNameSpinner.getSelectedItem().toString();
             String spentOn = mNewSpentMoneyWhereEditText.getText().toString();
             mSqlUtils.addBudgetItem(name, dollarsSpent, spentOn);
             mAdapter.swapCursor(mSqlUtils.getAllBudgetEntries());//, lastAddedGuestId);
@@ -185,10 +229,8 @@ public class MainActivity extends AppCompatActivity {
 
         mNewDollarsSpentEditText.getText().clear();
         mNewSpentMoneyWhereEditText.getText().clear();
-        mNewNameEditText.getText().clear();
         mNewDollarsSpentEditText.clearFocus();
         mNewSpentMoneyWhereEditText.clearFocus();
-        mNewNameEditText.clearFocus();
     }
 
 
