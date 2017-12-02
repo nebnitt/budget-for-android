@@ -9,6 +9,10 @@ import android.os.Bundle;
 import com.example.android.budget.data.BudgetContract;
 import com.example.android.budget.data.BudgetDbHelper;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 final class SqlUtils {
     private static SqlUtils instance = null;
 
@@ -17,6 +21,7 @@ final class SqlUtils {
     private String mNameColumn = BudgetContract.BudgetEntry.COLUMN_NAME;
     private String mDollarsColumn = BudgetContract.BudgetEntry.COLUMN_DOLLARS_SPENT;
     private String mSpentOnColumn = BudgetContract.BudgetEntry.COLUMN_SPENT_MONEY_ON;
+    private String mTimestampColumn = BudgetContract.BudgetEntry.COLUMN_TIMESTAMP;
 
     protected SqlUtils(Context context){
         // Create a DB helper (this will create the DB if run for the first time)
@@ -88,5 +93,36 @@ final class SqlUtils {
                     ", " + mDollarsColumn + " = " + dollars +
                 " WHERE _ID = " + idToUpdate;
         mDb.execSQL(sql);
+    }
+
+    class Overview {
+        String name;
+        int dollars;
+        String date;
+    }
+
+    ArrayList<Overview> getOverviewStatistics(){
+        String sql = "SELECT " + mNameColumn +
+                    ", SUM(" + mDollarsColumn + ")" +
+                    ", strftime('%m-%d-%Y', " + mTimestampColumn + ")" +
+                    " FROM " + mTableName +
+                    " GROUP BY " + mNameColumn +
+                    ", strftime('%m-%d-%Y', " + mTimestampColumn + ")" +
+                    " ORDER BY 3 ASC";
+        Cursor cursor = mDb.rawQuery(sql, null);
+        ArrayList<Overview> results = new ArrayList<>();
+        try {
+            while (cursor.moveToNext()) {
+                Overview result = new Overview();
+                result.name = cursor.getString(0);
+                result.dollars = cursor.getInt(1);
+                result.date = cursor.getString(2);
+                results.add(result);
+
+            }
+        } finally {
+            cursor.close();
+        }
+        return results;
     }
 }
