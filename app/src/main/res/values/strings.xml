@@ -16,4 +16,10 @@
         <item>Dan</item>
         <item>Erin</item>
     </string-array>
+
+    <string-array name="times_array">
+        <item>Day</item>
+        <item>Week</item>
+        <item>All</item>
+    </string-array>
 </resources>

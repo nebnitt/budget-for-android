@@ -239,6 +239,16 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    public void goToChart(){
+        Intent intent = new Intent(this, ChartActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToAllValues(){
+        Intent intent = new Intent(this, SeeAllActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.main, menu);
@@ -254,6 +264,12 @@ public class MainActivity extends AppCompatActivity
                 return true;
             case R.id.see_overview:
                 goToOverview();
+                return true;
+            case R.id.see_charts:
+                goToChart();
+                return true;
+            case R.id.see_all_values:
+                goToAllValues();
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);

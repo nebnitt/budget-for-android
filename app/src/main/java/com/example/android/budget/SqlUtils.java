@@ -10,14 +10,13 @@ import com.example.android.budget.data.BudgetContract;
 import com.example.android.budget.data.BudgetDbHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 final class SqlUtils {
     private static SqlUtils instance = null;
 
     private SQLiteDatabase mDb;
     private String mTableName = BudgetContract.BudgetEntry.TABLE_NAME;
+    private String mIdColumn = "_ID";
     private String mNameColumn = BudgetContract.BudgetEntry.COLUMN_NAME;
     private String mDollarsColumn = BudgetContract.BudgetEntry.COLUMN_DOLLARS_SPENT;
     private String mSpentOnColumn = BudgetContract.BudgetEntry.COLUMN_SPENT_MONEY_ON;
@@ -95,25 +94,84 @@ final class SqlUtils {
         mDb.execSQL(sql);
     }
 
-    class Overview {
-        String name;
+    class BudgetRecord {
+        int id;
         int dollars;
+        String name;
+        String spentOn;
         String date;
     }
 
-    ArrayList<Overview> getOverviewStatistics(){
-        String sql = "SELECT " + mNameColumn +
-                    ", SUM(" + mDollarsColumn + ")" +
-                    ", strftime('%m-%d-%Y', " + mTimestampColumn + ")" +
-                    " FROM " + mTableName +
-                    " GROUP BY " + mNameColumn +
-                    ", strftime('%m-%d-%Y', " + mTimestampColumn + ")" +
-                    " ORDER BY 3 ASC";
+
+
+    ArrayList<BudgetRecord> getAllRecords(){
+        String sql = "SELECT " + mIdColumn +
+                    ", " + mNameColumn  +
+                    ", " + mDollarsColumn +
+                    ", " + mSpentOnColumn +
+                    ", datetime(" + mTimestampColumn + ", 'localtime') " +
+                    " FROM " + mTableName;
+
         Cursor cursor = mDb.rawQuery(sql, null);
-        ArrayList<Overview> results = new ArrayList<>();
+        ArrayList<BudgetRecord> results = new ArrayList<>();
         try {
             while (cursor.moveToNext()) {
-                Overview result = new Overview();
+                BudgetRecord result = new BudgetRecord();
+                result.id = cursor.getInt(0);
+                result.name = cursor.getString(1);
+                result.dollars = cursor.getInt(2);
+                result.spentOn = cursor.getString(3);
+                result.date = cursor.getString(4);
+                results.add(result);
+            }
+        } finally {
+            cursor.close();
+        }
+        return results;
+
+    }
+
+    ArrayList<BudgetRecord> getTotalAggregateStatistics(){
+        String sql = "SELECT " + mNameColumn +
+                ", SUM(" + mDollarsColumn + ")" +
+                " FROM " + mTableName +
+                " GROUP BY " + mNameColumn;
+
+        Cursor cursor = mDb.rawQuery(sql, null);
+        ArrayList<BudgetRecord> results = new ArrayList<>();
+        try {
+            while (cursor.moveToNext()) {
+                BudgetRecord result = new BudgetRecord();
+                result.name = cursor.getString(0);
+                result.dollars = cursor.getInt(1);
+                result.date = "";
+                results.add(result);
+            }
+        } finally {
+            cursor.close();
+        }
+        return results;
+    }
+
+
+    ArrayList<BudgetRecord> getTimeLayeredStatistics(String timeLayer){
+        String sqlTime = "'%m-%d-%Y'";
+        if (timeLayer.equals("Week")){
+            sqlTime = "'%Y-%W'";
+        }
+        String sql = "SELECT " + mNameColumn +
+                ", SUM(" + mDollarsColumn + ")" +
+                ", strftime("+sqlTime+", " + "datetime(" + mTimestampColumn + ", 'localtime'))" +
+                " FROM " + mTableName +
+                " GROUP BY " + mNameColumn +
+                ", strftime("+sqlTime+", " + "datetime(" + mTimestampColumn + ", 'localtime'))" +
+                " ORDER BY 3 ASC";
+
+        Cursor cursor = mDb.rawQuery(sql, null);
+        ArrayList<BudgetRecord> results = new ArrayList<>();
+        try {
+            while (cursor.moveToNext()) {
+                BudgetRecord result = new BudgetRecord();
                 result.name = cursor.getString(0);
                 result.dollars = cursor.getInt(1);
                 result.date = cursor.getString(2);
