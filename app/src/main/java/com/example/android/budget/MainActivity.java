@@ -209,8 +209,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * This method is called when user clicks on the Add to waitlist menu item
+     * This method is called when user clicks on the Add to waitlist button
+     * I'm keeping the no-param function in case I want to use it elsewhere
      */
+    public void addToBudgetList(View view){
+        addToBudgetList();
+    }
+
     public void addToBudgetList() {
         if(mNewSpentMoneyWhereEditText.getText().length() == 0
             || mNewDollarsSpentEditText.getText().length() == 0){
@@ -259,9 +264,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem menuItem){
         int item_id = menuItem.getItemId();
         switch(item_id) {
-            case R.id.add_budget_entry:
-                addToBudgetList();
-                return true;
             case R.id.see_overview:
                 goToOverview();
                 return true;

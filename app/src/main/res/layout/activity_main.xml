@@ -9,7 +9,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
 
         <Spinner
             android:id="@+id/person_name_spinner"
@@ -19,7 +21,7 @@
 
         <EditText
             android:id="@+id/spent_money_where_edit_text"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/spent_on_what_hint"
@@ -35,6 +37,18 @@
             android:inputType="number"
             android:maxLength="3"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        <Button
+            android:id="@+id/add_to_budget_button"
+            android:onClick="addToBudgetList"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:text="@string/add_button_text"
+            android:layout_marginLeft="5dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse"
+            android:layout_weight="0.19" />
+
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
