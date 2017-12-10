@@ -132,8 +132,10 @@ final class SqlUtils {
     }
 
     ArrayList<BudgetRecord> getTotalAggregateStatistics(){
+        String sqlTime = "'%m-%d-%Y'";
         String sql = "SELECT " + mNameColumn +
                 ", SUM(" + mDollarsColumn + ")" +
+                ", MIN(strftime("+sqlTime+", " + "datetime(" + mTimestampColumn + ", 'localtime')))" +
                 " FROM " + mTableName +
                 " GROUP BY " + mNameColumn;
 
@@ -144,7 +146,7 @@ final class SqlUtils {
                 BudgetRecord result = new BudgetRecord();
                 result.name = cursor.getString(0);
                 result.dollars = cursor.getInt(1);
-                result.date = "";
+                result.date = cursor.getString(2);
                 results.add(result);
             }
         } finally {
@@ -156,12 +158,15 @@ final class SqlUtils {
 
     ArrayList<BudgetRecord> getTimeLayeredStatistics(String timeLayer){
         String sqlTime = "'%m-%d-%Y'";
+        String additionalWeekSelect = "";
         if (timeLayer.equals("Week")){
-            sqlTime = "'%Y-%W'";
+            sqlTime = "'%W-%Y'";
+            additionalWeekSelect = ", max(date(" + mTimestampColumn + ", 'weekday 0', '-7 day'))";
         }
         String sql = "SELECT " + mNameColumn +
                 ", SUM(" + mDollarsColumn + ")" +
                 ", strftime("+sqlTime+", " + "datetime(" + mTimestampColumn + ", 'localtime'))" +
+                additionalWeekSelect +
                 " FROM " + mTableName +
                 " GROUP BY " + mNameColumn +
                 ", strftime("+sqlTime+", " + "datetime(" + mTimestampColumn + ", 'localtime'))" +
@@ -175,6 +180,9 @@ final class SqlUtils {
                 result.name = cursor.getString(0);
                 result.dollars = cursor.getInt(1);
                 result.date = cursor.getString(2);
+                if (timeLayer.equals("Week")) {
+                    result.date = cursor.getString(3);
+                }
                 results.add(result);
 
             }

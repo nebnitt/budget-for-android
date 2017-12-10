@@ -38,7 +38,7 @@ public class OverviewActivity extends AppCompatActivity
 
         mDb = dbHelper.getReadableDatabase();
 
-        mLinearLayout = (LinearLayout) findViewById(R.id.wrapper_linear_layout);
+        mLinearLayout = (LinearLayout) findViewById(R.id.overview_wrapper_linear_layout);
 
         mSqlUtils = SqlUtils.getInstance(this);
 
@@ -73,22 +73,26 @@ public class OverviewActivity extends AppCompatActivity
         }
 
         String date_string = "";
-
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy", Locale.US);;
         for (SqlUtils.BudgetRecord result: results){
-            if(timeLayer.equals("Day")) {
-                SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
-                String date = result.date;
-                Date dt = null;
-                try {
-                    dt = sdf.parse(date);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                String this_date = android.text.format.DateFormat.format("EEEE", dt).toString();
-                date_string = " ON: " + result.date + ", a " + this_date;
+            if (timeLayer.equals("Week")) {
+                sdf = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
             }
 
+            String date = result.date;
+            Date dt = null;
+            try {
+                dt = sdf.parse(date);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            //TODO: Figure out why this isn't working in all cases; day of week is often wrong
+            String this_date = android.text.format.DateFormat.format("EEEE", dt).toString();
+            String qualifier = timeLayer.equals("All") ? " SINCE " : " ON: ";
+            date_string = qualifier + result.date + ", a " + this_date;
 
+
+            //TODO: This should probably be in a RecyclerView
             TextView overviewTextView = new TextView(this);
             String overviewText = result.name + " has spent: $" + String.valueOf(result.dollars) + date_string;
             overviewTextView.setText(overviewText);

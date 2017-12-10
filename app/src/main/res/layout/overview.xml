@@ -26,12 +26,18 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/wrapper_linear_layout"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:id="@+id/overview_scroll_view">
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/overview_wrapper_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
