@@ -54,9 +54,11 @@ public class OverviewActivity extends AppCompatActivity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // TODO: This isn't strictly a time selector now that "Categories" has been added;
+        // either create new Spinner or change variable naming
         String timeLayer = parent.getItemAtPosition(position).toString();
         mLinearLayout.removeAllViews();
-        displayResults(timeLayer);
+        getResults(timeLayer);
     }
 
     @Override
@@ -64,42 +66,54 @@ public class OverviewActivity extends AppCompatActivity
         // idk what this is for
     }
 
-    void displayResults(String timeLayer){
+    void getResults(String timeLayer){
         ArrayList<SqlUtils.BudgetRecord> results;
         if(timeLayer.equals("All")) {
             results = mSqlUtils.getTotalAggregateStatistics();
+        } else if (timeLayer.equals("Categories")) {
+            results = mSqlUtils.getCategoryStatistics();
         } else {
             results = mSqlUtils.getTimeLayeredStatistics(timeLayer);
         }
+        displayResults(results, timeLayer);
+    }
 
-        String date_string = "";
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy", Locale.US);;
-        for (SqlUtils.BudgetRecord result: results){
-            if (timeLayer.equals("Week")) {
-                sdf = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
+    void displayResults(ArrayList<SqlUtils.BudgetRecord> results, String timeLayer) {
+        if(!timeLayer.equals("Categories")) {
+            String date_string = "";
+            SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
+            for (SqlUtils.BudgetRecord result : results) {
+                String date = result.date;
+                Date dt = null;
+                try {
+                    dt = sdf.parse(date);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                //TODO: Figure out why this isn't working in all cases; day of week is often wrong
+                String this_date = android.text.format.DateFormat.format("EEEE", dt).toString();
+                String qualifier = timeLayer.equals("All") ? " since " : " on: ";
+                date_string = qualifier + result.date + ", a " + this_date;
+
+                String overviewText = result.name + " has spent: $" + String.valueOf(result.dollars) + date_string;
+                createTextView(overviewText);
             }
-
-            String date = result.date;
-            Date dt = null;
-            try {
-                dt = sdf.parse(date);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            //TODO: Figure out why this isn't working in all cases; day of week is often wrong
-            String this_date = android.text.format.DateFormat.format("EEEE", dt).toString();
-            String qualifier = timeLayer.equals("All") ? " SINCE " : " ON: ";
-            date_string = qualifier + result.date + ", a " + this_date;
-
-
-            //TODO: This should probably be in a RecyclerView
-            TextView overviewTextView = new TextView(this);
-            String overviewText = result.name + " has spent: $" + String.valueOf(result.dollars) + date_string;
-            overviewTextView.setText(overviewText);
-            overviewTextView.setPadding(10, 10, 10, 10);
-            overviewTextView.setTextSize(20);
-            mLinearLayout.addView(overviewTextView);
         }
+        else  {
+            for (SqlUtils.BudgetRecord result : results) {
+                String overviewText = result.name + " has spent: $" + String.valueOf(result.dollars) + " on " + result.spentOn;
+                createTextView(overviewText);
+            }
+        }
+    }
+
+    void createTextView(String text){
+        //TODO: This should probably be done in a RecyclerView
+        TextView overviewTextView = new TextView(this);
+        overviewTextView.setText(text);
+        overviewTextView.setPadding(10, 10, 10, 10);
+        overviewTextView.setTextSize(20);
+        mLinearLayout.addView(overviewTextView);
     }
 
 }

@@ -21,5 +21,6 @@
         <item>Day</item>
         <item>Week</item>
         <item>All</item>
+        <item>Categories</item>
     </string-array>
 </resources>

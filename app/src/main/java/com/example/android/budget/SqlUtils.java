@@ -9,6 +9,7 @@ import android.os.Bundle;
 import com.example.android.budget.data.BudgetContract;
 import com.example.android.budget.data.BudgetDbHelper;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 final class SqlUtils {
@@ -102,8 +103,6 @@ final class SqlUtils {
         String date;
     }
 
-
-
     ArrayList<BudgetRecord> getAllRecords(){
         String sql = "SELECT " + mIdColumn +
                     ", " + mNameColumn  +
@@ -128,67 +127,77 @@ final class SqlUtils {
             cursor.close();
         }
         return results;
-
     }
 
-    ArrayList<BudgetRecord> getTotalAggregateStatistics(){
-        String sqlTime = "'%m-%d-%Y'";
-        String sql = "SELECT " + mNameColumn +
-                ", SUM(" + mDollarsColumn + ")" +
-                ", MIN(strftime("+sqlTime+", " + "datetime(" + mTimestampColumn + ", 'localtime')))" +
-                " FROM " + mTableName +
-                " GROUP BY " + mNameColumn;
-
+    private ArrayList<BudgetRecord> executeSqlForBudgetStatisticsAndReturnResults(String sql, String selectedColumn, int selectedColumnIndex){
         Cursor cursor = mDb.rawQuery(sql, null);
         ArrayList<BudgetRecord> results = new ArrayList<>();
         try {
-            while (cursor.moveToNext()) {
-                BudgetRecord result = new BudgetRecord();
-                result.name = cursor.getString(0);
-                result.dollars = cursor.getInt(1);
-                result.date = cursor.getString(2);
-                results.add(result);
+            Field field = BudgetRecord.class.getDeclaredField(selectedColumn);
+            try {
+                while (cursor.moveToNext()) {
+                    BudgetRecord result = new BudgetRecord();
+                    result.name = cursor.getString(0);
+                    result.dollars = cursor.getInt(1);
+                    try {
+                        field.set(result, cursor.getString(selectedColumnIndex));
+                    } catch (IllegalAccessException ex) {
+                        ex.printStackTrace();
+                    }
+                    results.add(result);
+                }
+            } finally {
+                cursor.close();
             }
-        } finally {
-            cursor.close();
+            return results;
+        } catch (NoSuchFieldException ex) {
+            ex.printStackTrace();
         }
         return results;
     }
 
+    ArrayList<BudgetRecord> getTotalAggregateStatistics(){
+        String sqlTime = "'%m-%d-%Y'";
+        String selectedColumn = "date";
+        int selectedColumnIndex = 2;
+        String sql = "SELECT " + mNameColumn + ", SUM(" + mDollarsColumn + ")" +
+                ", MIN(strftime("+sqlTime+", " + "datetime(" + mTimestampColumn + ", 'localtime')))" +
+                " FROM " + mTableName +
+                " GROUP BY " + mNameColumn;
+
+        return executeSqlForBudgetStatisticsAndReturnResults(sql, selectedColumn, selectedColumnIndex);
+    }
+
+    ArrayList<BudgetRecord> getCategoryStatistics(){
+        String selectedColumn = "spentOn";
+        int selectedColumnIndex = 2;
+        String sql = "SELECT " + mNameColumn + ", SUM(" + mDollarsColumn + ")" +
+                ", " + mSpentOnColumn +
+                " FROM " + mTableName +
+                " GROUP BY " + mNameColumn + ", " + mSpentOnColumn;
+
+        return executeSqlForBudgetStatisticsAndReturnResults(sql, selectedColumn, selectedColumnIndex);
+    }
 
     ArrayList<BudgetRecord> getTimeLayeredStatistics(String timeLayer){
         String sqlTime = "'%m-%d-%Y'";
+        String selectedColumn = "date";
         String additionalWeekSelect = "";
         if (timeLayer.equals("Week")){
             sqlTime = "'%W-%Y'";
             additionalWeekSelect = ", max(date(" + mTimestampColumn + ", 'weekday 0', '-7 day'))";
         }
-        String sql = "SELECT " + mNameColumn +
-                ", SUM(" + mDollarsColumn + ")" +
+        String sql = "SELECT " + mNameColumn + ", SUM(" + mDollarsColumn + ")" +
                 ", strftime("+sqlTime+", " + "datetime(" + mTimestampColumn + ", 'localtime'))" +
                 additionalWeekSelect +
                 " FROM " + mTableName +
                 " GROUP BY " + mNameColumn +
                 ", strftime("+sqlTime+", " + "datetime(" + mTimestampColumn + ", 'localtime'))" +
                 " ORDER BY 3 ASC";
-
-        Cursor cursor = mDb.rawQuery(sql, null);
-        ArrayList<BudgetRecord> results = new ArrayList<>();
-        try {
-            while (cursor.moveToNext()) {
-                BudgetRecord result = new BudgetRecord();
-                result.name = cursor.getString(0);
-                result.dollars = cursor.getInt(1);
-                result.date = cursor.getString(2);
-                if (timeLayer.equals("Week")) {
-                    result.date = cursor.getString(3);
-                }
-                results.add(result);
-
-            }
-        } finally {
-            cursor.close();
+        int selectedColumnIndex = 2;
+        if (timeLayer.equals("Week")){
+            selectedColumnIndex = 3;
         }
-        return results;
+        return executeSqlForBudgetStatisticsAndReturnResults(sql, selectedColumn, selectedColumnIndex);
     }
 }
